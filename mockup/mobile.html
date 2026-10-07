@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mangajiee Workshop Map — Mobile Experience</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ============================================================
+       MANGAJIEE DESIGN SYSTEM — MOBILE FIRST
+       ============================================================ */
+    :root {
+      --bg-obsidian: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-surface-elevated: #1E1E1E;
+      --bg-input: #262626;
+      --accent-mustard: #C9A84C;
+      --accent-golden: #E2BD5B;
+      --accent-mocha: #6B5035;
+      --text-cream: #F5F0E8;
+      --text-ash: #9E9E9E;
+      --text-smoke: #666666;
+      --border-iron: #2B2B2B;
+      --border-highlight: #3F3F3F;
+      --status-success: #4E8A38;
+      --status-amber: #D97706;
+      --status-rust: #9E3A28;
+      --sheet-peek: 110px;
+      --sheet-half: 50vh;
+      --sheet-full: 90vh;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-obsidian);
+      color: var(--text-cream);
+    }
+
+    /* Container */
+    .mobile-app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* MAP CONTAINER */
+    #mobileMap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #080808;
+    }
+
+    /* FLOATING TOP HEADER */
+    .top-floating-bar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .top-floating-bar > * {
+      pointer-events: auto;
+    }
+
+    .brand-search-card {
+      background: rgba(20, 20, 20, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-iron);
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .mobile-logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--accent-mustard), #8A6D28);
+      color: var(--bg-obsidian);
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .mobile-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-cream);
+      font-size: 0.88rem;
+    }
+
+    .mobile-search-input::placeholder {
+      color: var(--text-smoke);
+    }
+
+    .desktop-switch-btn {
+      width: 34px;
+      height: 34px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-iron);
+      border-radius: 8px;
+      color: var(--text-ash);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    /* CHIPS FILTER SCROLLER */
+    .mobile-chips-carousel {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .mobile-chips-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-chip {
+      white-space: nowrap;
+      padding: 6px 14px;
+      background: rgba(20, 20, 20, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-iron);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-cream);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .mobile-chip.active {
+      background: rgba(201, 168, 76, 0.18);
+      border-color: var(--accent-mustard);
+      color: var(--accent-golden);
+      font-weight: 600;
+    }
+
+    .mobile-chip.gold-badge {
+      border-color: rgba(201, 168, 76, 0.5);
+    }
+
+    /* FLOATING MAP TOOLS (Right Side) */
+    .mobile-map-tools {
+      position: absolute;
+      right: 12px;
+      bottom: calc(var(--sheet-peek) + 20px);
+      z-index: 450;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-circle-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(20, 20, 20, 0.94);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-iron);
+      border-radius: 50%;
+      color: var(--text-cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s;
+    }
+
+    .mobile-circle-btn:active {
+      transform: scale(0.92);
+      border-color: var(--accent-mustard);
+    }
+
+    /* BASEMAP SELECTION MODAL */
+    .basemap-sheet-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 2500;
+      display: none;
+      align-items: flex-end;
+    }
+
+    .basemap-sheet-modal.open {
+      display: flex;
+    }
+
+    .basemap-sheet-body {
+      width: 100%;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-iron);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+    }
+
+    .basemap-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .basemap-card-opt {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-iron);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-ash);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .basemap-card-opt.active {
+      border-color: var(--accent-mustard);
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--accent-golden);
+    }
+
+    /* ============================================================
+       SWIPEABLE BOTTOM SHEET DRAWER
+       ============================================================ */
+    .bottom-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--sheet-peek);
+      background: rgba(18, 18, 18, 0.98);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-iron);
+      border-radius: 24px 24px 0 0;
+      z-index: 600;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bottom-sheet.half {
+      height: var(--sheet-half);
+    }
+
+    .bottom-sheet.full {
+      height: var(--sheet-full);
+    }
+
+    /* SHEET DRAG HANDLE */
+    .sheet-handle-zone {
+      padding: 10px 0 4px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sheet-pill {
+      width: 44px;
+      height: 5px;
+      background: #4A4A4A;
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+
+    .sheet-summary-bar {
+      width: 100%;
+      padding: 0 20px 8px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .sheet-title {
+      font-weight: 700;
+      color: var(--text-cream);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sheet-toggle-hint {
+      font-size: 0.72rem;
+      color: var(--accent-golden);
+      font-weight: 600;
+    }
+
+    /* SHEET SCROLLABLE CONTENT */
+    .sheet-scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 16px 30px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: none;
+    }
+
+    .sheet-scroll-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* COMPACT MOBILE WORKSHOP CARD */
+    .mobile-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-iron);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .mobile-card.active {
+      border-color: var(--accent-mustard);
+      background: #201D17;
+    }
+
+    .mobile-card-top {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .mobile-card-thumb {
+      width: 84px;
+      height: 84px;
+      border-radius: 10px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .mobile-card-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mobile-card-rec {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: linear-gradient(135deg, var(--accent-mustard), #A8862F);
+      color: var(--bg-obsidian);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .mobile-card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-cream);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+
+    .mobile-card-area {
+      font-size: 0.75rem;
+      color: var(--text-ash);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .mobile-card-specs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .mini-tag {
+      font-size: 0.68rem;
+      background: var(--bg-input);
+      color: #DDD;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* CARD ACTION BAR */
+    .mobile-card-actions {
+      display: flex;
+      border-top: 1px solid var(--border-iron);
+      padding: 8px 12px;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .card-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .card-btn-wa {
+      background: var(--accent-mustard);
+      color: var(--bg-obsidian);
+    }
+
+    .card-btn-detail {
+      background: var(--bg-input);
+      color: var(--text-cream);
+      border: 1px solid var(--border-iron);
+    }
+
+    /* FULLSCREEN DETAIL DRAWER FOR MOBILE */
+    .mobile-detail-drawer {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-surface);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .mobile-detail-drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-nav-bar {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-iron);
+      position: sticky;
+      top: 0;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 20;
+    }
+
+    .drawer-hero-img {
+      height: 220px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .drawer-hero-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, var(--bg-surface) 100%);
+    }
+
+    .drawer-body-padding {
+      padding: 16px 20px 100px 20px;
+    }
+
+    /* STICKY BOTTOM ACTION ON MOBILE DETAIL */
+    .mobile-sticky-action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px;
+      background: rgba(20, 20, 20, 0.96);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-iron);
+      display: flex;
+      gap: 10px;
+      z-index: 3100;
+    }
+
+    .mobile-sticky-action-bar a {
+      flex: 1;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: 10px;
+      text-decoration: none;
+    }
+
+    /* Leaflet popup customization for mobile */
+    .leaflet-popup-content-wrapper {
+      background: #181818 !important;
+      color: #FFF !important;
+      border: 1px solid #333 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8) !important;
+    }
+    .leaflet-popup-tip {
+      background: #181818 !important;
+    }
+
+    /* MARKERS */
+    .mobile-gold-pin {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-mustard), #8A6D28);
+      border: 2px solid #FFF;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(201, 168, 76, 0.7);
+    }
+    .mobile-gold-pin i {
+      transform: rotate(45deg);
+      color: #0A0A0A;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-app-wrapper">
+    
+    <!-- FULLSCREEN LEAFLET MAP -->
+    <div id="mobileMap"></div>
+
+    <!-- FLOATING TOP BAR -->
+    <div class="top-floating-bar">
+      <!-- Search & Brand -->
+      <div class="brand-search-card">
+        <div class="mobile-logo-badge">
+          <i data-lucide="wrench" style="width: 14px; height: 14px;"></i>
+          <span>MANGAJIEE</span>
+        </div>
+        <input type="text" id="mobSearchInput" class="mobile-search-input" placeholder="Cari spesialis, kaki-kaki, BMW...">
+        <a href="index.html" class="desktop-switch-btn" title="Buka Mode Desktop">
+          <i data-lucide="monitor" style="width: 16px; height: 16px;"></i>
+        </a>
+      </div>
+
+      <!-- Quick Chips Filter Carousel -->
+      <div class="mobile-chips-carousel" id="mobChipsBar">
+        <div class="mobile-chip active" data-filter="all">Semua (8)</div>
+        <div class="mobile-chip gold-badge" data-filter="recommended">🏅 Mangajiee Choice</div>
+        <div class="mobile-chip" data-filter="kaki-kaki">Kaki-Kaki</div>
+        <div class="mobile-chip" data-filter="bmw">BMW Specialist</div>
+        <div class="mobile-chip" data-filter="ac">AC & Cooling</div>
+        <div class="mobile-chip" data-filter="toyota">Toyota</div>
+        <div class="mobile-chip" data-filter="electrical">Electrical / ECU</div>
+      </div>
+    </div>
+
+    <!-- FLOATING MAP BUTTONS -->
+    <div class="mobile-map-tools" id="mobMapTools">
+      <button class="mobile-circle-btn" onclick="openBasemapModal()" title="Ganti Basemap">
+        <i data-lucide="layers" style="width: 20px; height: 20px; color: var(--accent-mustard);"></i>
+      </button>
+      <button class="mobile-circle-btn" onclick="resetMobileMap()" title="Lokasi Bandung">
+        <i data-lucide="crosshair" style="width: 20px; height: 20px;"></i>
+      </button>
+    </div>
+
+    <!-- SWIPEABLE BOTTOM SHEET DRAWER -->
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-handle-zone" onclick="cycleSheetState()">
+        <div class="sheet-pill"></div>
+        <div class="sheet-summary-bar">
+          <div class="sheet-title">
+            <i data-lucide="map-pin" style="width: 14px; height: 14px; color: var(--accent-mustard);"></i>
+            <span id="sheetCountText">8 Bengkel Terpilih</span>
+          </div>
+          <div class="sheet-toggle-hint" id="sheetHint">Ketuk untuk Membuka ↑</div>
+        </div>
+      </div>
+
+      <!-- Scrollable list of cards -->
+      <div class="sheet-scroll-content" id="mobWorkshopsList">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BASEMAP SELECTOR MODAL (MOBILE) -->
+  <div class="basemap-sheet-modal" id="basemapModal" onclick="closeBasemapModal(event)">
+    <div class="basemap-sheet-body" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1rem; color: var(--text-cream); font-family: 'Plus Jakarta Sans', sans-serif;">Pilih Basemap Peta</h3>
+        <button onclick="closeBasemapModal()" style="background: none; border: none; color: var(--text-ash);"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="basemap-grid">
+        <div class="basemap-card-opt active" id="mopt-google-road" onclick="setMobileBasemap('google-road')">
+          <i data-lucide="map" style="width: 22px; height: 22px; color: var(--accent-mustard);"></i>
+          <span>Google Jalan</span>
+        </div>
+        <div class="basemap-card-opt" id="mopt-carto-dark" onclick="setMobileBasemap('carto-dark')">
+          <i data-lucide="moon" style="width: 22px; height: 22px;"></i>
+          <span>CARTO Dark</span>
+        </div>
+        <div class="basemap-card-opt" id="mopt-google-hybrid" onclick="setMobileBasemap('google-hybrid')">
+          <i data-lucide="satellite" style="width: 22px; height: 22px;"></i>
+          <span>Google Satelit</span>
+        </div>
+        <div class="basemap-card-opt" id="mopt-carto-voyager" onclick="setMobileBasemap('carto-voyager')">
+          <i data-lucide="compass" style="width: 22px; height: 22px;"></i>
+          <span>CARTO Voyager</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE FULLSCREEN DETAIL DRAWER -->
+  <div class="mobile-detail-drawer" id="mobDetailDrawer">
+    <div class="drawer-nav-bar">
+      <button onclick="closeDetailDrawer()" style="background: none; border: none; color: var(--text-cream); display: flex; align-items: center; gap: 4px; font-size: 0.82rem; font-weight: 600;">
+        <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i> Kembali ke Peta
+      </button>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-golden);">MANGAJIEE CURATED</div>
+    </div>
+
+    <div class="drawer-hero-img" id="drawerHero"></div>
+
+    <div class="drawer-body-padding">
+      <div id="drawerRecBadge" style="display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, var(--accent-mustard), #A8862F); color: #0A0A0A; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; margin-bottom: 8px;">
+        <i data-lucide="crown" style="width: 13px; height: 13px;"></i> MANGAJIEE CHOICE
+      </div>
+
+      <h1 id="drawerTitle" style="font-size: 1.4rem; color: #FFF; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 6px;">Nama Bengkel</h1>
+      <div id="drawerAddress" style="color: var(--text-ash); font-size: 0.8rem; display: flex; align-items: center; gap: 6px; margin-bottom: 16px;">
+        <i data-lucide="map-pin" style="width: 14px; height: 14px; color: var(--accent-mustard);"></i>
+        <span>Alamat Bengkel</span>
+      </div>
+
+      <!-- Curator Callout Box -->
+      <div id="drawerCuratorBox" style="background: #1C1914; border-left: 3px solid var(--accent-mustard); border-radius: 0 10px 10px 0; padding: 14px; margin-bottom: 20px;">
+        <div style="color: var(--accent-mustard); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px;">
+          Why Mangajiee Recommends It
+        </div>
+        <p id="drawerCuratorText" style="font-size: 0.88rem; color: #E8E2D5; font-style: italic; line-height: 1.5;">
+          "Narasi kurasi."
+        </p>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--accent-golden); margin-top: 8px;">
+          — Aji Mangajiee (Lead Curator)
+        </div>
+      </div>
+
+      <!-- Specs & Brands -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-size: 0.75rem; color: var(--text-ash); text-transform: uppercase; margin-bottom: 8px;">Spesialisasi & Merek</div>
+        <div id="drawerTags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+      </div>
+
+      <!-- Facilities & Hours -->
+      <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-iron); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 0.78rem; font-weight: 700; color: #FFF; margin-bottom: 8px;">Jam Buka & Fasilitas:</div>
+        <div style="font-size: 0.8rem; color: #BBB; line-height: 1.6;">
+          🕒 Senin – Sabtu: 08:30 – 17:00 WIB<br>
+          ☕ Ruang Tunggu AC, Free Wi-Fi, Coffee<br>
+          🛡️ Garansi Pengerjaan Terverifikasi
+        </div>
+      </div>
+    </div>
+
+    <!-- STICKY ACTION BAR -->
+    <div class="mobile-sticky-action-bar">
+      <a id="drawerWaBtn" href="#" target="_blank" style="background: var(--accent-mustard); color: #0A0A0A;">
+        <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
+        <span>Chat WhatsApp</span>
+      </a>
+      <a id="drawerGmapsBtn" href="#" target="_blank" style="background: var(--bg-surface-elevated); color: #FFF; border: 1px solid var(--border-iron);">
+        <i data-lucide="navigation" style="width: 18px; height: 18px;"></i>
+        <span>Petunjuk Arah</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    // DATA DUMMY
+    const WORKSHOPS = [
+      {
+        id: "ws-1",
+        name: "Auto Prima European Specialist",
+        area: "Dago, Bandung Utara",
+        address: "Jl. Ir. H. Juanda No. 182, Dago, Bandung",
+        coords: [-6.8856, 107.6145],
+        isRecommended: true,
+        curatorNote: "Spesialis BMW & Mercedes-Benz paling rapi di Dago. Teknisi bersertifikasi ex-dealer resmi. Alat scan diagnostik OEM lengkap.",
+        specs: ["BMW", "Mercedes-Benz", "Kaki-Kaki", "Diagnostik ECU"],
+        image: "https://images.unsplash.com/photo-1613214149922-f1809c99b414?auto=format&fit=crop&w=700&q=80",
+        phone: "6281223456789"
+      },
+      {
+        id: "ws-2",
+        name: "Bengkel Kaki-Kaki Sinar Maju",
+        area: "Pasir Kaliki, Bandung",
+        address: "Jl. Pasir Kaliki No. 94, Bandung",
+        coords: [-6.9082, 107.6012],
+        isRecommended: true,
+        curatorNote: "Jawara problem racksteer bunyi dan bushing arm oblak. Mengutamakan perbaikan presisi bubut.",
+        specs: ["Kaki-Kaki", "Racksteer", "Understeel", "Bubut Custom"],
+        image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=700&q=80",
+        phone: "6281334567890"
+      },
+      {
+        id: "ws-3",
+        name: "ProAuto AC & Electrical Master",
+        area: "Buah Batu, Bandung",
+        address: "Jl. Buah Batu No. 210, Bandung",
+        coords: [-6.9465, 107.6258],
+        isRecommended: true,
+        curatorNote: "Flushing AC dengan mesin computerized murni tanpa bongkar dasbor sembarangan.",
+        specs: ["AC & Cooling", "Electrical", "Flushing Evaporator"],
+        image: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=700&q=80",
+        phone: "6281778912345"
+      },
+      {
+        id: "ws-4",
+        name: "Bandung Performance Lab",
+        area: "Soekarno Hatta, Bandung",
+        address: "Jl. Soekarno Hatta No. 472, Bandung",
+        coords: [-6.9535, 107.6432],
+        isRecommended: true,
+        curatorNote: "Dyno test di tempat, remap ECU harian aman anti ngelitik.",
+        specs: ["Remap ECU", "Dyno Tuning", "Turbo Upgrade"],
+        image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=80",
+        phone: "6281908765432"
+      },
+      {
+        id: "ws-5",
+        name: "Dago Motor Servis Rutin",
+        area: "Dago Atas, Bandung",
+        address: "Jl. Bukit Dago Utara No. 45, Bandung",
+        coords: [-6.8720, 107.6189],
+        isRecommended: false,
+        curatorNote: null,
+        specs: ["Servis Berkala", "Tune-Up", "Toyota/Jepang"],
+        image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=700&q=80",
+        phone: "6282111223344"
+      },
+      {
+        id: "ws-6",
+        name: "Pasteur Body Repair & Oven",
+        area: "Pasteur, Bandung Barat",
+        address: "Jl. Dr. Djunjunan No. 138, Bandung",
+        coords: [-6.8923, 107.5842],
+        isRecommended: false,
+        curatorNote: null,
+        specs: ["Body & Paint", "Cat Oven Spies Hecker"],
+        image: "https://images.unsplash.com/photo-1625047509168-a7026f36de04?auto=format&fit=crop&w=700&q=80",
+        phone: "6282299887766"
+      },
+      {
+        id: "ws-7",
+        name: "V-Tech Japanese Specialist",
+        area: "Lengkong, Bandung",
+        address: "Jl. Lengkong Besar No. 89, Bandung",
+        coords: [-6.9271, 107.6124],
+        isRecommended: false,
+        curatorNote: null,
+        specs: ["Honda", "Toyota", "Kaki-Kaki"],
+        image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=700&q=80",
+        phone: "6285612349876"
+      },
+      {
+        id: "ws-8",
+        name: "Sentra Diesel Bandung",
+        area: "Kopo, Bandung",
+        address: "Jl. Raya Kopo No. 345, Bandung",
+        coords: [-6.9520, 107.5890],
+        isRecommended: false,
+        curatorNote: null,
+        specs: ["Common Rail", "Injektor", "Fuel Pump"],
+        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=700&q=80",
+        phone: "6281898765432"
+      }
+    ];
+
+    let mobileMap;
+    let mobMarkers = new Map();
+    let currentFilter = 'all';
+    let sheetState = 'peek'; // 'peek', 'half', 'full'
+
+    // Basemaps with Carto key
+    const CARTO_KEY = 'cb1_322a_1_ade8349609fe9c1ecd181774';
+    const BASEMAP_TILES = {
+      'google-road': L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
+      }),
+      'carto-dark': L.tileLayer(`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_KEY}`, {
+        subdomains: 'abcd',
+        attribution: '&copy; CARTO',
+        maxZoom: 20
+      }),
+      'google-hybrid': L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        attribution: '&copy; Google Maps',
+        maxZoom: 20
+      }),
+      'carto-voyager': L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_KEY}`, {
+        subdomains: 'abcd',
+        attribution: '&copy; CARTO',
+        maxZoom: 20
+      })
+    };
+
+    let activeTileKey = 'google-road';
+
+    function initMobileMap() {
+      mobileMap = L.map('mobileMap', {
+        center: [-6.9147, 107.6098],
+        zoom: 13,
+        zoomControl: false
+      });
+
+      BASEMAP_TILES[activeTileKey].addTo(mobileMap);
+      renderMobileMarkers(WORKSHOPS);
+    }
+
+    function createMobIcon(isRec) {
+      if (isRec) {
+        return L.divIcon({
+          className: '',
+          html: `<div class="mobile-gold-pin"><i data-lucide="crown" style="width:16px;height:16px;"></i></div>`,
+          iconSize: [36, 36],
+          iconAnchor: [18, 36]
+        });
+      }
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:30px;height:30px;background:#222;border:2px solid #555;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;"><i data-lucide="wrench" style="transform:rotate(45deg);color:#CCC;width:12px;height:12px;"></i></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
+      });
+    }
+
+    function renderMobileMarkers(data) {
+      mobMarkers.forEach(m => mobileMap.removeLayer(m));
+      mobMarkers.clear();
+
+      data.forEach(item => {
+        const marker = L.marker(item.coords, {
+          icon: createMobIcon(item.isRecommended)
+        }).addTo(mobileMap);
+
+        marker.on('click', () => {
+          focusWorkshop(item.id);
+        });
+
+        mobMarkers.set(item.id, marker);
+      });
+
+      setTimeout(() => lucide.createIcons(), 50);
+    }
+
+    function renderMobileList(data) {
+      const container = document.getElementById('mobWorkshopsList');
+      container.innerHTML = '';
+      document.getElementById('sheetCountText').textContent = `${data.length} Bengkel Terpilih`;
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'mobile-card';
+        card.id = `mcard-${item.id}`;
+        card.onclick = () => focusWorkshop(item.id);
+
+        const tagsHtml = item.specs.map(s => `<span class="mini-tag">${s}</span>`).join('');
+
+        card.innerHTML = `
+          <div class="mobile-card-top">
+            <div class="mobile-card-thumb" style="background-image: url('${item.image}')"></div>
+            <div class="mobile-card-details">
+              ${item.isRecommended ? '<div class="mobile-card-rec">★ MANGAJIEE CHOICE</div>' : ''}
+              <div class="mobile-card-title">${item.name}</div>
+              <div class="mobile-card-area"><i data-lucide="map-pin" style="width:12px;height:12px;color:var(--accent-mustard);"></i> ${item.area}</div>
+              <div class="mobile-card-specs">${tagsHtml}</div>
+            </div>
+          </div>
+          <div class="mobile-card-actions">
+            <button class="card-action-btn card-btn-detail" onclick="event.stopPropagation(); openDetailDrawer('${item.id}')">
+              Lihat Detail
+            </button>
+            <a href="https://wa.me/${item.phone}?text=Halo%20${encodeURIComponent(item.name)},%20saya%20menemukan%20bengkel%20ini%20dari%20Mangajiee%20Workshop%20Map." target="_blank" class="card-action-btn card-btn-wa" onclick="event.stopPropagation()">
+              <i data-lucide="message-circle" style="width:13px;height:13px;"></i> WhatsApp
+            </a>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function focusWorkshop(id) {
+      const w = WORKSHOPS.find(x => x.id === id);
+      if (!w) return;
+
+      // Pan to coords
+      mobileMap.flyTo(w.coords, 15, { duration: 0.6 });
+
+      // Highlight card
+      document.querySelectorAll('.mobile-card').forEach(c => c.classList.remove('active'));
+      const activeCard = document.getElementById(`mcard-${id}`);
+      if (activeCard) {
+        activeCard.classList.add('active');
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // If sheet is peek, bump to half so card is easily seen
+      if (sheetState === 'peek') {
+        setSheetState('half');
+      }
+    }
+
+    // BOTTOM SHEET CONTROLS
+    function setSheetState(state) {
+      sheetState = state;
+      const sheet = document.getElementById('bottomSheet');
+      const hint = document.getElementById('sheetHint');
+      const tools = document.getElementById('mobMapTools');
+
+      sheet.classList.remove('half', 'full');
+      if (state === 'half') {
+        sheet.classList.add('half');
+        hint.textContent = 'Tarik ke Atas untuk Penuh ↑';
+        tools.style.bottom = 'calc(var(--sheet-half) + 16px)';
+      } else if (state === 'full') {
+        sheet.classList.add('full');
+        hint.textContent = 'Ketuk untuk Menutup ↓';
+        tools.style.bottom = 'calc(var(--sheet-full) + 16px)';
+      } else {
+        hint.textContent = 'Ketuk untuk Membuka ↑';
+        tools.style.bottom = 'calc(var(--sheet-peek) + 20px)';
+      }
+    }
+
+    function cycleSheetState() {
+      if (sheetState === 'peek') setSheetState('half');
+      else if (sheetState === 'half') setSheetState('full');
+      else setSheetState('peek');
+    }
+
+    function resetMobileMap() {
+      mobileMap.flyTo([-6.9147, 107.6098], 13);
+      setSheetState('peek');
+    }
+
+    // BASEMAP SWITCHER
+    function openBasemapModal() {
+      document.getElementById('basemapModal').classList.add('open');
+      lucide.createIcons();
+    }
+    function closeBasemapModal() {
+      document.getElementById('basemapModal').classList.remove('open');
+    }
+    function setMobileBasemap(key) {
+      if (key === activeTileKey || !BASEMAP_TILES[key]) return;
+      mobileMap.removeLayer(BASEMAP_TILES[activeTileKey]);
+      BASEMAP_TILES[key].addTo(mobileMap);
+      activeTileKey = key;
+
+      document.querySelectorAll('.basemap-card-opt').forEach(b => b.classList.remove('active'));
+      document.getElementById(`mopt-${key}`).classList.add('active');
+      closeBasemapModal();
+    }
+
+    // FULLSCREEN DETAIL DRAWER
+    function openDetailDrawer(id) {
+      const w = WORKSHOPS.find(x => x.id === id);
+      if (!w) return;
+
+      document.getElementById('drawerHero').style.backgroundImage = `url('${w.image}')`;
+      document.getElementById('drawerTitle').textContent = w.name;
+      document.getElementById('drawerAddress').querySelector('span').textContent = w.address;
+
+      const curatorBox = document.getElementById('drawerCuratorBox');
+      const recBadge = document.getElementById('drawerRecBadge');
+      if (w.isRecommended) {
+        curatorBox.style.display = 'block';
+        recBadge.style.display = 'inline-flex';
+        document.getElementById('drawerCuratorText').textContent = `"${w.curatorNote}"`;
+      } else {
+        curatorBox.style.display = 'none';
+        recBadge.style.display = 'none';
+      }
+
+      document.getElementById('drawerTags').innerHTML = w.specs.map(s => `<span class="mini-tag" style="padding:4px 8px; font-size:0.75rem;">${s}</span>`).join('');
+      document.getElementById('drawerWaBtn').href = `https://wa.me/${w.phone}?text=Halo%20${encodeURIComponent(w.name)},%20saya%20menemukan%20rekomendasi%20bengkel%20ini%20dari%20Mangajiee%20Workshop%20Map.`;
+      document.getElementById('drawerGmapsBtn').href = `https://www.google.com/maps/search/?api=1&query=${w.coords[0]},${w.coords[1]}`;
+
+      document.getElementById('mobDetailDrawer').classList.add('open');
+      lucide.createIcons();
+    }
+
+    function closeDetailDrawer() {
+      document.getElementById('mobDetailDrawer').classList.remove('open');
+    }
+
+    // CHIPS FILTER & SEARCH
+    document.getElementById('mobChipsBar').addEventListener('click', (e) => {
+      const chip = e.target.closest('.mobile-chip');
+      if (!chip) return;
+
+      document.querySelectorAll('.mobile-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      const filter = chip.dataset.filter;
+      let filtered = [...WORKSHOPS];
+
+      if (filter === 'recommended') filtered = filtered.filter(w => w.isRecommended);
+      else if (filter === 'kaki-kaki') filtered = filtered.filter(w => w.specs.some(s => s.toLowerCase().includes('kaki-kaki')));
+      else if (filter === 'bmw') filtered = filtered.filter(w => w.specs.some(s => s.toLowerCase().includes('bmw')));
+      else if (filter === 'ac') filtered = filtered.filter(w => w.specs.some(s => s.toLowerCase().includes('ac')));
+      else if (filter === 'toyota') filtered = filtered.filter(w => w.specs.some(s => s.toLowerCase().includes('toyota')));
+      else if (filter === 'electrical') filtered = filtered.filter(w => w.specs.some(s => s.toLowerCase().includes('electrical')));
+
+      renderMobileList(filtered);
+      renderMobileMarkers(filtered);
+      setSheetState('half');
+    });
+
+    document.getElementById('mobSearchInput').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = WORKSHOPS.filter(w => 
+        w.name.toLowerCase().includes(q) ||
+        w.area.toLowerCase().includes(q) ||
+        w.specs.some(s => s.toLowerCase().includes(q))
+      );
+      renderMobileList(filtered);
+      renderMobileMarkers(filtered);
+      if (q.length > 0 && sheetState === 'peek') setSheetState('half');
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initMobileMap();
+      renderMobileList(WORKSHOPS);
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
