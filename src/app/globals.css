@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-obsidian: #0F0F0F;
+  --bg-charcoal: #1A1A1A;
+  --bg-graphite: #242424;
+  --accent-mustard: #C9A84C;
+  --accent-golden: #E0BC6A;
+  --accent-mocha: #6B5035;
+  --text-cream: #F5F0E8;
+  --text-ash: #9A9A9A;
+  --border-iron: #2E2E2E;
+}
+
+body {
+  background-color: var(--bg-obsidian);
+  color: var(--text-cream);
+  min-height: 100vh;
+}
+
+/* Custom Leaflet Styling */
+.leaflet-container {
+  background-color: #080808 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1A1A1A !important;
+  color: #F5F0E8 !important;
+  border: 1px solid #2E2E2E !important;
+  border-radius: 12px !important;
+}
+
+.leaflet-popup-tip {
+  background: #1A1A1A !important;
+  border: 1px solid #2E2E2E !important;
+}
