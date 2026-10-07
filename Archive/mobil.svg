@@ -1,0 +1,111 @@
+<svg viewBox="0 0 400 720" width="400" height="720" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Fleet Health Dashboard - mobil.svg (top-view / bird's eye)
+    Interactive part IDs (harus match dengan js/config/vehicleCategories.js -> mobil.parts):
+      hood, engine, radiator, battery, oil, brake, lights,
+      front_left_tire, front_right_tire, rear_left_tire, rear_right_tire
+    Default fill semua part = #BDC3C7 ("Belum dicek", sesuai Warna Status di spec).
+    Warna diubah lewat JS: document.getElementById(partId).setAttribute('fill', statusColor)
+    Elemen dekoratif (bayangan, kaca, spion, garis pintu, dll) TIDAK punya id -> tidak ikut berubah warna.
+  -->
+
+  <!-- Orientation labels -->
+  <text x="200" y="26" text-anchor="middle" font-family="sans-serif" font-size="16" font-style="italic" fill="#95A5A6">DEPAN</text>
+  <text x="200" y="704" text-anchor="middle" font-family="sans-serif" font-size="16" font-style="italic" fill="#95A5A6">BELAKANG</text>
+
+  <!-- Shadow -->
+  <ellipse cx="200" cy="685" rx="148" ry="18" fill="#000000" opacity="0.10"/>
+
+  <!-- Chassis (decorative base body) -->
+  <rect x="110" y="50" width="180" height="620" rx="55" ry="55" fill="#ECF0F1" stroke="#7F8C8D" stroke-width="3"/>
+
+  <!-- Roof centerline crease (decorative) -->
+  <line x1="200" y1="258" x2="200" y2="448" stroke="#D5D8DC" stroke-width="2" stroke-dasharray="5,5"/>
+
+  <!-- Door seam lines (decorative) -->
+  <line x1="112" y1="330" x2="288" y2="330" stroke="#D5D8DC" stroke-width="2.5"/>
+  <line x1="112" y1="443" x2="288" y2="443" stroke="#D5D8DC" stroke-width="2.5"/>
+
+  <!-- Trunk seam line (decorative) -->
+  <line x1="128" y1="608" x2="272" y2="608" stroke="#D5D8DC" stroke-width="2"/>
+
+  <!-- ============ FRONT TIRES ============ -->
+  <rect id="front_left_tire" x="70" y="126" width="48" height="116" rx="18" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Ban Depan Kiri</title></rect>
+  <circle cx="94" cy="184" r="10" fill="#2C3E50" opacity="0.55"/>
+  <line x1="76" y1="150" x2="112" y2="150" stroke="#7F8C8D" stroke-width="2"/>
+  <line x1="76" y1="218" x2="112" y2="218" stroke="#7F8C8D" stroke-width="2"/>
+
+  <rect id="front_right_tire" x="282" y="126" width="48" height="116" rx="18" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Ban Depan Kanan</title></rect>
+  <circle cx="306" cy="184" r="10" fill="#2C3E50" opacity="0.55"/>
+  <line x1="288" y1="150" x2="324" y2="150" stroke="#7F8C8D" stroke-width="2"/>
+  <line x1="288" y1="218" x2="324" y2="218" stroke="#7F8C8D" stroke-width="2"/>
+
+  <!-- ============ REAR TIRES ============ -->
+  <rect id="rear_left_tire" x="70" y="468" width="48" height="116" rx="18" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Ban Belakang Kiri</title></rect>
+  <circle cx="94" cy="526" r="10" fill="#2C3E50" opacity="0.55"/>
+  <line x1="76" y1="492" x2="112" y2="492" stroke="#7F8C8D" stroke-width="2"/>
+  <line x1="76" y1="560" x2="112" y2="560" stroke="#7F8C8D" stroke-width="2"/>
+
+  <rect id="rear_right_tire" x="282" y="468" width="48" height="116" rx="18" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Ban Belakang Kanan</title></rect>
+  <circle cx="306" cy="526" r="10" fill="#2C3E50" opacity="0.55"/>
+  <line x1="288" y1="492" x2="324" y2="492" stroke="#7F8C8D" stroke-width="2"/>
+  <line x1="288" y1="560" x2="324" y2="560" stroke="#7F8C8D" stroke-width="2"/>
+
+  <!-- Side mirrors (decorative) -->
+  <rect x="93" y="252" width="19" height="34" rx="9" fill="#5D6D7E" stroke="#2C3E50" stroke-width="1.5"/>
+  <rect x="288" y="252" width="19" height="34" rx="9" fill="#5D6D7E" stroke="#2C3E50" stroke-width="1.5"/>
+
+  <!-- ============ HOOD ============ -->
+  <rect id="hood" x="122" y="58" width="156" height="156" rx="42" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Body Depan (Hood)</title></rect>
+
+  <!-- Front windshield (decorative, drawn above hood) -->
+  <path d="M150,213 L250,213 L236,254 L164,254 Z" fill="#AED6F1" opacity="0.75" stroke="#5DADE2" stroke-width="1.5"/>
+
+  <!-- ============ RADIATOR / GRILLE ============ -->
+  <rect id="radiator" x="153" y="64" width="94" height="20" rx="8" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2"><title>Radiator</title></rect>
+  <line x1="168" y1="67" x2="168" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+  <line x1="182" y1="67" x2="182" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+  <line x1="196" y1="67" x2="196" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+  <line x1="204" y1="67" x2="204" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+  <line x1="218" y1="67" x2="218" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+  <line x1="232" y1="67" x2="232" y2="81" stroke="#7F8C8D" stroke-width="1.5"/>
+
+  <!-- ============ LIGHTS (headlights + taillights, satu id) ============ -->
+  <g id="lights" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2">
+    <title>Lampu</title>
+    <rect x="130" y="88" width="26" height="15" rx="6"/>
+    <rect x="244" y="88" width="26" height="15" rx="6"/>
+    <rect x="130" y="636" width="26" height="16" rx="6"/>
+    <rect x="244" y="636" width="26" height="16" rx="6"/>
+  </g>
+
+  <!-- ============ ENGINE BAY: BATTERY / ENGINE / OIL ============ -->
+  <!-- Battery -->
+  <rect id="battery" x="138" y="112" width="34" height="42" rx="5" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2"><title>Aki (Battery)</title></rect>
+  <rect x="144" y="105" width="7" height="8" fill="#2C3E50"/>
+  <rect x="159" y="105" width="7" height="8" fill="#2C3E50"/>
+  <line x1="147" y1="127" x2="147" y2="139" stroke="#2C3E50" stroke-width="2"/>
+  <line x1="141" y1="133" x2="153" y2="133" stroke="#2C3E50" stroke-width="2"/>
+  <line x1="158" y1="133" x2="168" y2="133" stroke="#2C3E50" stroke-width="2"/>
+
+  <!-- Engine -->
+  <rect id="engine" x="180" y="108" width="56" height="54" rx="8" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Engine</title></rect>
+  <line x1="192" y1="108" x2="192" y2="97" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+  <line x1="208" y1="108" x2="208" y2="95" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+  <line x1="224" y1="108" x2="224" y2="97" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="208" cy="138" r="9" fill="none" stroke="#2C3E50" stroke-width="2"/>
+
+  <!-- Oil -->
+  <path id="oil" d="M264,112 C254,126 247,138 247,149 C247,159.5 254.6,167 264,167 C273.4,167 281,159.5 281,149 C281,138 274,126 264,112 Z" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2"><title>Oli (Oil)</title></path>
+  <circle cx="258" cy="144" r="3" fill="#FFFFFF" opacity="0.6"/>
+
+  <!-- ============ BRAKE (simbolis, cabin area) ============ -->
+  <circle id="brake" cx="200" cy="365" r="27" fill="#BDC3C7" stroke="#2C3E50" stroke-width="2.5"><title>Rem (Brake)</title></circle>
+  <line x1="200" y1="343" x2="200" y2="387" stroke="#2C3E50" stroke-width="2"/>
+  <line x1="173" y1="365" x2="227" y2="365" stroke="#2C3E50" stroke-width="2"/>
+  <circle cx="200" cy="365" r="6" fill="#2C3E50"/>
+  <rect x="219" y="352" width="15" height="26" rx="3" fill="#5D6D7E" stroke="#2C3E50" stroke-width="1.5"/>
+
+  <!-- Rear windshield (decorative) -->
+  <path d="M164,455 L236,455 L250,498 L150,498 Z" fill="#AED6F1" opacity="0.75" stroke="#5DADE2" stroke-width="1.5"/>
+</svg>
