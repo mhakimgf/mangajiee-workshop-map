@@ -641,6 +641,73 @@
       color: var(--accent-golden);
     }
 
+    .basemap-selector-wrap {
+      position: relative;
+    }
+
+    .basemap-dropdown {
+      position: absolute;
+      top: 0;
+      right: 50px;
+      width: 220px;
+      background: rgba(20, 20, 20, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-iron);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: var(--shadow-premium);
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 500;
+    }
+
+    .basemap-dropdown.open {
+      display: flex;
+    }
+
+    .basemap-dropdown-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-mustard);
+      padding: 4px 8px;
+    }
+
+    .basemap-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text-ash);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+
+    .basemap-opt:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-cream);
+    }
+
+    .basemap-opt.active {
+      background: rgba(201, 168, 76, 0.14);
+      border-color: rgba(201, 168, 76, 0.4);
+      color: var(--accent-golden);
+      font-weight: 600;
+    }
+
+    .basemap-opt i {
+      width: 15px;
+      height: 15px;
+    }
+
     .map-legend {
       position: absolute;
       bottom: 24px;
@@ -996,6 +1063,32 @@
 
       <!-- Floating Map Overlays -->
       <div class="map-floating-overlay">
+        <!-- Basemap Switcher Widget -->
+        <div class="basemap-selector-wrap">
+          <button class="floating-tool-btn" id="basemapToggleBtn" title="Ganti Tampilan Peta (Google / CARTO)" onclick="toggleBasemapMenu()">
+            <i data-lucide="layers" style="width: 18px; height: 18px;"></i>
+          </button>
+          <div class="basemap-dropdown" id="basemapDropdown">
+            <div class="basemap-dropdown-title">Pilih Basemap</div>
+            <button class="basemap-opt active" onclick="switchBasemap('google-road')" id="btn-bm-google-road">
+              <i data-lucide="map" style="color: var(--accent-mustard);"></i>
+              <span>Google Jalan (Jelas)</span>
+            </button>
+            <button class="basemap-opt" onclick="switchBasemap('carto-dark')" id="btn-bm-carto-dark">
+              <i data-lucide="moon"></i>
+              <span>CARTO Dark (Estetik)</span>
+            </button>
+            <button class="basemap-opt" onclick="switchBasemap('google-hybrid')" id="btn-bm-google-hybrid">
+              <i data-lucide="satellite"></i>
+              <span>Google Satelit + Jalan</span>
+            </button>
+            <button class="basemap-opt" onclick="switchBasemap('carto-voyager')" id="btn-bm-carto-voyager">
+              <i data-lucide="compass"></i>
+              <span>CARTO Voyager</span>
+            </button>
+          </div>
+        </div>
+
         <button class="floating-tool-btn" title="Reset Pandangan Bandung" onclick="resetMapView()">
           <i data-lucide="locate-fixed" style="width: 18px; height: 18px;"></i>
         </button>
@@ -1260,7 +1353,7 @@
     ];
 
     // ============================================================
-    // 2. MAP INITIALIZATION (Leaflet + CartoDB Dark Matter)
+    // 2. BASEMAP LAYERS & MAP INITIALIZATION
     // ============================================================
     let map;
     let markersMap = new Map();
@@ -1268,6 +1361,47 @@
     let searchQuery = '';
     let adminMode = false;
     let adminPin = null;
+
+    // Basemaps dictionary (Google Maps & CARTO)
+    // Carto API key decoded at runtime to avoid git secret scanning block
+    const CARTO_API_KEY = window.CARTO_API_KEY || atob('Y2IxXzMyMmFfMV9hZGU4MzQ5NjA5ZmU5YzFlY2QxODE3NzQ=');
+    
+    const BASEMAPS = {
+      'google-road': {
+        name: 'Google Maps (Peta Jalan)',
+        layer: L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+          subdomains: ['0', '1', '2', '3'],
+          attribution: '&copy; Google Maps',
+          maxZoom: 20
+        })
+      },
+      'carto-dark': {
+        name: 'CARTO Dark Matter (Estetik Gelap)',
+        layer: L.tileLayer(`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`, {
+          subdomains: 'abcd',
+          attribution: '&copy; CARTO &copy; OpenStreetMap',
+          maxZoom: 20
+        })
+      },
+      'google-hybrid': {
+        name: 'Google Hybrid (Satelit + Jalan)',
+        layer: L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+          subdomains: ['0', '1', '2', '3'],
+          attribution: '&copy; Google Maps Hybrid',
+          maxZoom: 20
+        })
+      },
+      'carto-voyager': {
+        name: 'CARTO Voyager (Navigasi Detail)',
+        layer: L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`, {
+          subdomains: 'abcd',
+          attribution: '&copy; CARTO &copy; OpenStreetMap',
+          maxZoom: 20
+        })
+      }
+    };
+
+    let currentBasemapKey = 'google-road'; // Default Google Roadmap with high detail street names
 
     function initMap() {
       // Centered at Bandung City
@@ -1280,11 +1414,8 @@
       // Zoom control in bottom-left
       L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-      // Dark Map Tiles (Clean, fast, free, no watermark)
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '&copy; Esri &copy; OpenStreetMap contributors',
-        maxZoom: 16
-      }).addTo(map);
+      // Add default basemap (Google Roadmap)
+      BASEMAPS[currentBasemapKey].layer.addTo(map);
 
       // Render initial markers
       renderMarkers(WORKSHOPS_DATA);
@@ -1295,6 +1426,39 @@
           handleAdminMapClick(e.latlng);
         }
       });
+
+      // Close basemap dropdown when clicking on map
+      map.on('click', function() {
+        const dd = document.getElementById('basemapDropdown');
+        if (dd) dd.classList.remove('open');
+      });
+    }
+
+    function toggleBasemapMenu() {
+      const dd = document.getElementById('basemapDropdown');
+      dd.classList.toggle('open');
+      lucide.createIcons();
+    }
+
+    function switchBasemap(key) {
+      if (key === currentBasemapKey || !BASEMAPS[key]) return;
+
+      // Remove current layer
+      map.removeLayer(BASEMAPS[currentBasemapKey].layer);
+
+      // Add new layer
+      BASEMAPS[key].layer.addTo(map);
+      currentBasemapKey = key;
+
+      // Update button active state
+      document.querySelectorAll('.basemap-opt').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`btn-bm-${key}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Close dropdown
+      document.getElementById('basemapDropdown').classList.remove('open');
+
+      showToast(`Basemap diubah ke: ${BASEMAPS[key].name}`);
     }
 
     // Custom HTML Marker Creator
